@@ -61,7 +61,7 @@ def create_maps(shuffled_words):
 
 
 def check_maps():
-    """ Perform checks to ensure correctness and return checksum. """
+    """ Perform checks to ensure correctness and return signature. """
     words = read_words()
     for w in words:
         if w not in encrypt_map:
@@ -83,14 +83,14 @@ def write_maps(signature):
         out_file.write(dumps(decrypt_map))
 
 
-def main(seed, is_test=False):
+def main(seed, persist=False):
     shuffled_words = read_words()
     deterministic_shuffle(shuffled_words, seed)
     create_maps(shuffled_words)
-    checksum = check_maps()
-    if not is_test:
-        write_maps(checksum)
-    return checksum
+    signature = check_maps()
+    if persist:
+        write_maps(signature)
+    return signature
 
 
 def test():
@@ -98,7 +98,7 @@ def test():
     if hex_to_int(str_to_hash("test")) != 2676412545:
         print("[ERROR] Unexpected hash to integer value!")
         exit(1)
-    if main("test", True) != "dbbcf31":
+    if main("test") != "dbbcf31":
         print("[ERROR] Test failed with unexpected checksum!")
         exit(1)
     print("Test passed.")
@@ -106,4 +106,4 @@ def test():
 
 test()
 password = input("Enter password: ")
-print("Encrypt map checksum: " + main(password))
+print("Encrypt map signature: " + main(password, True))
